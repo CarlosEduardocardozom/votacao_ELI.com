@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Votação TecnoIF</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Script para a API Google -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+
+    <div class="container mt-5 text-center">
+        <h2>Faça Login para Votar nas Propostas</h2>
+        <!-- Botão de Login com Google -->
+        <div id="g_id_onload" data-client_id="371082078188-0hnqr7m9d8nvpn0b3gcvpqphnqvag5ha.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup"
+            data-callback="onSignIn" data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+            data-text="sign_in_with" data-size="large" data-logo_alignment="center">
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+</body>
+
+</html>
