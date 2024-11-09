@@ -1,13 +1,13 @@
 const END_DATE = new Date('2024-11-15');
 const proposals = [
-    { id: 1, image: './papagaio.jpg', title: 'Proposta 1' },
-    { id: 2, image: './onc.jpeg', title: 'Proposta 2' },
-    { id: 3, image: './papagaio.jpg', title: 'Proposta 3' },
-    { id: 4, image: './papagaio.jpg', title: 'Proposta 4' },
-    { id: 5, image: './papagaio.jpg', title: 'Proposta 5' },
-    { id: 6, image: './dourado.jpg', title: 'Proposta 6' },
-    { id: 7, image: './papagaio.jpg', title: 'Proposta 7' },
-    { id: 8, image: './papagaio.jpg', title: 'Proposta 8' }
+    { id: 1, image: '../papagaio.jpg', title: 'Proposta 1' },
+    { id: 2, image: '../onc.jpeg', title: 'Proposta 2' },
+    { id: 3, image: '../papagaio.jpg', title: 'Proposta 3' },
+    { id: 4, image: '../papagaio.jpg', title: 'Proposta 4' },
+    { id: 5, image: '../papagaio.jpg', title: 'Proposta 5' },
+    { id: 6, image: '../dourado.jpg', title: 'Proposta 6' },
+    { id: 7, image: '../papagaio.jpg', title: 'Proposta 7' },
+    { id: 8, image: '../papagaio.jpg', title: 'Proposta 8' }
 ];
 
 // Inicializa os votos a partir do localStorage
