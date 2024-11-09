@@ -1,7 +1,7 @@
 const proposals = [
-    { id: 1, image: '../Downloads/papagaio.jpg', title: 'Proposta 1' },
-    { id: 2, image: '../Downloads/onc.jpeg', title: 'Proposta 2' },
-    { id: 3, image: '../Downloads/papagaio.jpg', title: 'Proposta 3' }
+    { id: 1, image: './papagaio.jpg', title: 'Proposta 1' },
+    { id: 2, image: './onc.jpeg', title: 'Proposta 2' },
+    { id: 3, image: './papagaio.jpg', title: 'Proposta 3' }
 ];
 
 // Inicializa os votos
