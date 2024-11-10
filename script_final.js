@@ -1,7 +1,17 @@
+document.addEventListener('DOMContentLoaded', () => {
+    if (!localStorage.getItem('isLoggedIn')) {
+        window.location.href = 'votação_ELI.html'; // Redireciona para a página de login se o usuário não estiver logado
+    }
+    initializeVotes();
+    renderProposals();
+    updatePercentages();
+});
+
+
 const proposals = [
-    { id: 1, image: './papagaio.jpg', title: 'Proposta 1' },
-    { id: 2, image: './onc.jpeg', title: 'Proposta 2' },
-    { id: 3, image: './papagaio.jpg', title: 'Proposta 3' }
+    { id: 1, image: '../Downloads/papagaio.jpg', title: 'Proposta 1' },
+    { id: 2, image: '../Downloads/onc.jpeg', title: 'Proposta 2' },
+    { id: 3, image: '../Downloads/papagaio.jpg', title: 'Proposta 3' }
 ];
 
 // Inicializa os votos
@@ -15,8 +25,22 @@ function initializeVotes() {
     localStorage.setItem('userVotes', JSON.stringify(userVotes));
 }
 
+// Calcula a porcentagem de votos
+function calculatePercentages() {
+    const userVotes = JSON.parse(localStorage.getItem('userVotes')) || {};
+    const totalVotes = Object.values(userVotes).reduce((sum, vote) => sum + vote.votes, 0);
+
+    const percentages = proposals.map((proposal) => {
+        const votes = userVotes[proposal.id]?.votes || 0;
+        const percentage = totalVotes === 0 ? 0 : ((votes / totalVotes) * 100).toFixed(2);
+        return { id: proposal.id, percentage };
+    });
+
+    return percentages;
+}
+
 // Alternar voto
-function toggleVote(proposalId, voteButton, voteCount) {
+function toggleVote(proposalId, voteButton, voteCount, percentageText) {
     const userVotes = JSON.parse(localStorage.getItem('userVotes')) || {};
     const currentVote = Object.values(userVotes).find((vote) => vote.voted);
 
@@ -25,7 +49,6 @@ function toggleVote(proposalId, voteButton, voteCount) {
         return;
     }
 
-    // Verifica se o usuário já votou nesta proposta
     if (userVotes[proposalId]?.voted) {
         userVotes[proposalId].votes -= 1;
         userVotes[proposalId].voted = false;
@@ -50,16 +73,31 @@ function toggleVote(proposalId, voteButton, voteCount) {
     localStorage.setItem('userVotes', JSON.stringify(userVotes));
     voteCount.textContent = userVotes[proposalId].votes;
 
-    // Animação do ícone de voto
+    updatePercentages();
+
     voteButton.classList.add('vote-animation');
     setTimeout(() => voteButton.classList.remove('vote-animation'), 600);
 }
+
+// Atualiza as porcentagens na tela
+function updatePercentages() {
+    const percentages = calculatePercentages();
+
+    percentages.forEach(({ id, percentage }) => {
+        const percentageText = document.querySelector(`.percentage[data-id="${id}"]`);
+        if (percentageText) {
+            percentageText.textContent = `Votos: ${percentage}%`;
+        }
+    });
+}
+
 // Renderiza as propostas
 function renderProposals() {
     const proposalGrid = document.getElementById('proposalGrid');
     proposalGrid.innerHTML = '';
 
     const userVotes = JSON.parse(localStorage.getItem('userVotes')) || {};
+    const percentages = calculatePercentages();
 
     proposals.forEach((proposal) => {
         const card = document.createElement('div');
@@ -81,21 +119,28 @@ function renderProposals() {
         voteCount.classList.add('vote-count');
         voteCount.textContent = userVotes[proposal.id]?.votes || 0;
 
+        const percentageText = document.createElement('p');
+        percentageText.classList.add('percentage');
+        percentageText.setAttribute('data-id', proposal.id);
+        const percentage = percentages.find(p => p.id === proposal.id)?.percentage || '0.00';
+        percentageText.textContent = `Votos: ${percentage}%`;
+
         if (userVotes[proposal.id]?.voted) {
             voteButton.classList.add('voted');
         }
 
-        voteButton.onclick = () => toggleVote(proposal.id, voteButton, voteCount);
+        voteButton.onclick = () => toggleVote(proposal.id, voteButton, voteCount, percentageText);
 
         card.appendChild(img);
         card.appendChild(title);
         card.appendChild(voteButton);
         card.appendChild(voteCount);
+        card.appendChild(percentageText);
         proposalGrid.appendChild(card);
     });
 }
 
-// Ícone SVG de votação (dedo indicador)
+// Ícone SVG de votação
 function getVoteSVG() {
     return `
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="vote-icon">
@@ -120,29 +165,9 @@ function showAlert(message) {
 // Estilos adicionais
 const style = document.createElement('style');
 style.textContent = `
-    .alert-box {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #ff4444;
-        color: #fff;
-        padding: 10px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        font-size: 1.1em;
-        z-index: 1000;
-        transition: opacity 0.5s;
-    }
-    .fade-out {
-        opacity: 0;
-    }
-    .vote-animation {
-        animation: vote-bounce 0.6s;
-    }
-    @keyframes vote-bounce {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.2); }
+    .percentage {
+        font-weight: bold;
+        margin-top: 5px;
     }
     .voted {
         color: #28a745;
@@ -150,7 +175,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Inicializar votos e contagem regressiva
+// Inicializar votos e renderizar
 document.addEventListener('DOMContentLoaded', () => {
     initializeVotes();
     renderProposals();

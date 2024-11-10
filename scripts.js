@@ -1,13 +1,13 @@
 const END_DATE = new Date('2024-11-15');
 const proposals = [
-    { id: 1, image: './papagaio.jpg', title: 'Proposta 1' },
-    { id: 2, image: './onc.jpeg', title: 'Proposta 2' },
-    { id: 3, image: './papagaio.jpg', title: 'Proposta 3' },
-    { id: 4, image: './papagaio.jpg', title: 'Proposta 4' },
-    { id: 5, image: './papagaio.jpg', title: 'Proposta 5' },
-    { id: 6, image: './dourado.jpg', title: 'Proposta 6' },
-    { id: 7, image: './papagaio.jpg', title: 'Proposta 7' },
-    { id: 8, image: './papagaio.jpg', title: 'Proposta 8' }
+    { id: 1, image: '../Downloads/papagaio.jpg', title: 'Proposta 1' },
+    { id: 2, image: '../Downloads/onc.jpeg', title: 'Proposta 2' },
+    { id: 3, image: '../Downloads/papagaio.jpg', title: 'Proposta 3' },
+    { id: 4, image: '../Downloads/papagaio.jpg', title: 'Proposta 4' },
+    { id: 5, image: '../Downloads/papagaio.jpg', title: 'Proposta 5' },
+    { id: 6, image: '../Downloads/dourado.jpg', title: 'Proposta 6' },
+    { id: 7, image: '../Downloads/papagaio.jpg', title: 'Proposta 7' },
+    { id: 8, image: '../Downloads/papagaio.jpg', title: 'Proposta 8' }
 ];
 
 // Inicializa os votos a partir do localStorage
@@ -26,26 +26,22 @@ function toggleLike(proposalId, likeButton, voteCount) {
     const userVotes = JSON.parse(localStorage.getItem('userVotes')) || {};
     const currentVote = Object.values(userVotes).find((vote) => vote.voted);
 
-    // Verifica se o usuário já votou em outra proposta
     if (currentVote && !userVotes[proposalId]?.voted) {
         showAlert('⚠️ Você já votou em uma proposta! Retire seu voto atual para escolher outra.');
         return;
     }
 
-    // Se o usuário já votou nesta proposta, remover o voto
     if (userVotes[proposalId]?.voted) {
         userVotes[proposalId].votes -= 1;
         userVotes[proposalId].voted = false;
         likeButton.classList.remove('liked');
         likeButton.querySelector('.heart-icon').style.fill = 'currentColor';
     } else {
-        // Remover voto da proposta anterior, se houver
         if (currentVote) {
             const previousProposalId = proposals.find(p => userVotes[p.id]?.voted)?.id;
             userVotes[previousProposalId].votes -= 1;
             userVotes[previousProposalId].voted = false;
 
-            // Atualizar o botão da proposta anterior
             const previousButton = document.querySelector(`button[data-id="${previousProposalId}"]`);
             previousButton.classList.remove('liked');
             previousButton.querySelector('.heart-icon').style.fill = 'currentColor';
@@ -53,18 +49,15 @@ function toggleLike(proposalId, likeButton, voteCount) {
             previousCount.textContent = userVotes[previousProposalId].votes;
         }
 
-        // Adicionar o voto na nova proposta
         userVotes[proposalId].votes += 1;
         userVotes[proposalId].voted = true;
         likeButton.classList.add('liked');
         likeButton.querySelector('.heart-icon').style.fill = '#ff0000';
     }
 
-    // Atualizar o localStorage e o contador de votos
     localStorage.setItem('userVotes', JSON.stringify(userVotes));
     voteCount.textContent = userVotes[proposalId].votes;
 
-    // Animação do coração
     likeButton.classList.add('heart-animation');
     setTimeout(() => likeButton.classList.remove('heart-animation'), 600);
 }
@@ -127,16 +120,7 @@ function renderProposals() {
     });
 }
 
-// Ícone SVG do coração
-function getHeartSVG() {
-    return `
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="heart-icon">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>
-        </svg>
-    `;
-}
-
-// Mostrar alerta estilizado
+// Mostrar alerta
 function showAlert(message) {
     const alertBox = document.createElement('div');
     alertBox.classList.add('alert-box');
@@ -149,40 +133,38 @@ function showAlert(message) {
     }, 2000);
 }
 
-// Estilos adicionais para alerta e animação
-const style = document.createElement('style');
-style.textContent = `
-    .alert-box {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #ff4444;
-        color: #fff;
-        padding: 10px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        font-size: 1.1em;
-        z-index: 1000;
-        transition: opacity 0.5s;
+// Verificar status de login
+function checkLoginStatus() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+
+    if (!isLoggedIn) {
+        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        loginModal.show(); // Exibe o modal usando o Bootstrap 5.3
+    } else {
+        renderProposals(); // Carrega as propostas se o usuário estiver logado
     }
-    .fade-out {
-        opacity: 0;
+}
+
+// Evento de login
+document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if (email && password) {
+        localStorage.setItem('isLoggedIn', 'true');
+        const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+        loginModal.hide(); // Fecha o modal após o login
+        renderProposals(); // Carrega as propostas após o login
+    } else {
+        alert('Por favor, insira um email e senha válidos.');
     }
-    .heart-animation {
-        animation: heart-pulse 0.6s;
-    }
-    @keyframes heart-pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.3); }
-    }
-`;
-document.head.appendChild(style);
+});
 
 // Inicializar contagem regressiva, votos e renderizar propostas
 document.addEventListener('DOMContentLoaded', () => {
     initializeVotes();
     updateCountdown();
     setInterval(updateCountdown, 1000 * 60 * 60);
-    renderProposals();
+    checkLoginStatus(); // Verifica se o usuário está logado
 });
